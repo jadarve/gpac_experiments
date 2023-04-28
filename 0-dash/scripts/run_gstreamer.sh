@@ -12,7 +12,7 @@ gst-launch-1.0 -e \
     audio_resample_tee. ! queue ! audioconvert ! "audio/x-raw,channels=2" ! avenc_aac name=audio_encoder ! "audio/mpeg" ! aacparse ! tee name=audio_encoder_tee \
     \
     video_transcoded_enc_tee. ! queue name=video_transcoded_queue ! flvmux streamable=true name=flv_mux_transcoded ! tee name=flv_mux_transcoded_tee \
-    audio_resample_tee. ! queue ! audioconvert ! flv_mux_transcoded. \
+    audio_encoder_tee. ! queue ! flv_mux_transcoded. \
     \
     flv_mux_transcoded_tee. ! queue ! rtmpsink location="${PUSH_URL} live=1" name=rtmp_sink_transcoded
 
