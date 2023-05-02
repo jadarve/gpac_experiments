@@ -1,5 +1,5 @@
 gst-launch-1.0 -e \
-    videotestsrc ! "video/x-raw,height=720,width=1280" ! queue ! tee name=video_raw_tee \
+    videotestsrc ! "video/x-raw,height=720,width=1280,framerate=25/1" ! queue ! tee name=video_raw_tee \
     audiotestsrc wave=ticks apply-tick-ramp=true tick-interval=100000000 freq=10000 volume=0.4 marker-tick-period=10 sine-periods-per-tick=20 ! queue ! tee name=audio_raw_tee \
     \
     video_raw_tee. ! queue name=video_scale_queue ! videoscale ! video/x-raw,height=240,width=360 ! tee name=video_scale_tee \
@@ -15,16 +15,3 @@ gst-launch-1.0 -e \
     audio_encoder_tee. ! queue ! flv_mux_transcoded. \
     \
     flv_mux_transcoded_tee. ! queue ! rtmpsink location="${PUSH_URL} live=1" name=rtmp_sink_transcoded
-
-###########################################################
-# Replacing
-#
-# audio_encoder_tee. ! queue ! flv_mux_transcoded. \
-#
-# with
-#
-# audio_resample_tee. ! queue ! audioconvert ! flv_mux_transcoded. \
-#
-# will push raw audio to the RTMP server (GPAC). Gpac will ignore the audio PID and build
-# the DASH stream with the video track.
-# 

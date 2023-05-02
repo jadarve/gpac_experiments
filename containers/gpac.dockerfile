@@ -21,6 +21,7 @@ RUN apt update \
     curl \
     debhelper \
     dvb-apps \
+    fonts-open-sans \
     g++ \
     git \
     liba52-0.7.4-dev \
@@ -57,14 +58,13 @@ RUN apt update \
     libvorbis-dev \
     libvpx-dev \
     libwebp-dev \
+    libx264-dev \
     libx265-dev \
     libxcb-shape0-dev \
     libxcb-shm0-dev \
     libxcb-xfixes0-dev \
     libxv-dev \
     libxvidcore-dev \
-    libx264-dev \
-    libx265-dev \
     mesa-utils \
     pkg-config \
     scons \
