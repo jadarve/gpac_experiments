@@ -61,6 +61,7 @@ RUN apt update \
     libvorbis-dev \
     libvpx-dev \
     libwebp-dev \
+    libx264-dev \
     libx265-dev \
     libxcb-shape0-dev \
     libxcb-shm0-dev \
