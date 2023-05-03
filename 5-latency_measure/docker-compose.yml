@@ -1,0 +1,43 @@
+version: '3'
+services:
+  gpac:
+    image: gpac_experiments:gpac
+    container_name: gpac
+    ports:
+      - "5000:5000/udp"
+    volumes:
+      - ".:/tmp/workdir"
+    command:
+      - "sh"
+      - "/tmp/workdir/scripts/run_gpac.sh"
+    depends_on:
+      - http_origin
+    restart: always
+  http_origin:
+    image: gpac_experiments:http_origin
+    container_name: http_origin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ".:/tmp/workdir"
+    command:
+      - "sh"
+      - "/tmp/workdir/scripts/run_http_origin.sh"
+  gstreamer:
+    image: gpac_experiments:gstreamer
+    container_name: gstreamer
+    environment:
+      - UDP_HOST=gpac
+      - UDP_PORT=5000
+      - APP_NAME="GStreamer"
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - ".:/tmp/workdir"
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command:
+      - "sh"
+      - "/tmp/workdir/scripts/run_gstreamer.sh"
+    depends_on:
+      - gpac
+    restart: always
+
