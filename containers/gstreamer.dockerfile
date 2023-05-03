@@ -115,9 +115,10 @@ RUN  \
     --extra-libs=-ldl \
     --extra-libs=-lpthread && \
     make -j && \
-    make install
+    make install && \
+    ldconfig
 
-ENV         LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
+ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
 
 RUN apt update \
     && apt remove -y \
