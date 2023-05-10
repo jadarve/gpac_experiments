@@ -33,6 +33,23 @@
 
             // Listen for error events.
             player.addEventListener('error', onErrorEvent);
+            player.configure({
+                streaming: {
+                    lowLatencyMode: true,
+                    inaccurateManifestTolerance: 0.1,
+                    rebufferingGoal: 5.0,
+                },
+                drm: {
+                    servers: {
+                        // both URLs ar avaiable in the EZDRM XML file.
+                        // For widevine, it corresponds to the ServerURL element.
+                        'com.widevine.alpha': 'https://widevine-dash.ezdrm.com/proxy?pX=03B9F8',
+
+                        // For playready, it corresponds to the LAURL element.
+                        'com.microsoft.playready': 'https://playready.ezdrm.com/cency/preauth.aspx?pX=24713F'
+                    }
+                }
+            });
 
             // Try to load a manifest.
             // This is an asynchronous process.
