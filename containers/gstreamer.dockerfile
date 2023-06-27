@@ -1,5 +1,8 @@
-FROM  ubuntu:20.04
-LABEL MAINTAINER="GeniusLive"
+FROM  ubuntu:22.04
+LABEL MANTAINER="GeniusLive"
+
+# Setting bash as the default shell in this container
+SHELL ["/bin/bash", "-c"] 
 
 # Environment variable to configure timezone
 ENV TZ=Etc/UTC \
@@ -8,11 +11,9 @@ ENV TZ=Etc/UTC \
 WORKDIR /tmp/workdir
 
 RUN apt update \
-    && apt install -y \
-    tzdata \
+    && apt install -y tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-# Install GPAC build dependencies
 RUN apt update \
     && apt install -y \
     build-essential \
@@ -53,9 +54,8 @@ RUN apt update \
     libraw1394-dev \
     librtmp-dev \
     libsdl2-dev \
-    libsrt-dev \
+    libsrt-openssl-dev \
     libssl-dev \
-    libssl1.1 \
     libswscale-dev \
     libtheora-dev \
     libvorbis-dev \
@@ -76,6 +76,7 @@ RUN apt update \
     x11proto-video-dev \
     yasm \
     zlib1g-dev \
+    libsrtp2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ## Build ffmpeg https://ffmpeg.org/
@@ -122,26 +123,55 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
 
 RUN apt update \
     && apt remove -y \
-        meson \
+    meson \
     && apt install -y \
-        python3-pip \
-        flex \
-        bison \
+    python3-pip \
+    flex \
+    bison \
     && pip3 install meson ninja \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone --depth 1 --branch 1.22.2 https://github.com/GStreamer/gstreamer.git \
     && cd gstreamer \
     && meson setup --wipe \
-        -Dlibav=enabled \
-        -Dgood=enabled \
-        -Dbad=enabled \
-        -Dugly=enabled \
-        -Dgpl=enabled \
-        -Dgst-plugins-bad:rtmp=enabled \
-        -Dgst-plugins-bad:srt=enabled \
-        builddir \
+    -Dlibav=enabled \
+    -Dgood=enabled \
+    -Dbad=enabled \
+    -Dugly=enabled \
+    -Dgpl=enabled \
+    -Dgst-plugins-bad:rtmp=enabled \
+    -Dgst-plugins-bad:srt=enabled \
+    builddir \
     && meson compile -C builddir \
     && cd builddir \
     && meson install \
     && ldconfig
+
+# Install curl and cargo
+RUN curl https://sh.rustup.rs -sSf > rustup.sh \
+    && chmod +x rustup.sh \
+    && ./rustup.sh -y \
+    && rm -f rustup.sh
+
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN git clone --depth 1 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git  \
+    && cd gst-plugins-rs \
+    && cargo build --release
+
+ENV GST_PLUGIN_PATH=/tmp/workdir/gst-plugins-rs/target/release:$GST_PLUGIN_PATH
+
+WORKDIR /usr/lib/geniuslive/gstreamer/plugin
+
+RUN rm -rf sources
+
+# Install fallbackswitch plugin, which has fallbacksrc element
+RUN git clone --depth 1 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git \
+    && cd gst-plugins-rs \
+    && source "$HOME/.cargo/env" \
+    && cargo install cargo-c \
+    && cargo cbuild --release -p gst-plugin-fallbackswitch
+
+RUN mv gst-plugins-rs/target/x86_64-unknown-linux-gnu/release/libgstfallbackswitch.so . \
+    && rm -rf gst-plugins-rs
+
+ENV GST_PLUGIN_PATH=/usr/lib/geniuslive/gstreamer/plugin

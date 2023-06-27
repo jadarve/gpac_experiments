@@ -52,7 +52,9 @@ ENV         FFMPEG_VERSION=5.1 \
     LIBARIBB24_VERSION=1.0.3 \
     LIBPNG_VERSION=1.6.9 \
     LIBVMAF_VERSION=2.1.1 \
-    SRC=/usr/local
+    SRC=/usr/local \
+    MAKEFLAGS="-j8" \
+    MAKEOPTS="-j8"
 
 ARG         FREETYPE_SHA256SUM="5eab795ebb23ac77001cfb68b7d4d50b5d6c7469247b0b01b2c953269f658dac freetype-2.10.4.tar.gz"
 ARG         FRIBIDI_SHA256SUM="3fc96fa9473bd31dcb5500bdf1aa78b337ba13eb8c301e7c28923fea982453a8 0.19.7.tar.gz"
@@ -511,13 +513,7 @@ RUN \
 RUN  \
     DIR=/tmp/ffmpeg && mkdir -p ${DIR} && cd ${DIR} && \
     curl -sLO https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 && \
-    tar -jx --strip-components=1 -f ffmpeg-${FFMPEG_VERSION}.tar.bz2 && \
-    ./configure     --disable-debug  --disable-doc    --disable-ffplay   --enable-shared --enable-gpl  --extra-libs=-ldl && \
-    make ;  make install
-
-
-
-
+    tar -jx --strip-components=1 -f ffmpeg-${FFMPEG_VERSION}.tar.bz2
 
 ## Build ffmpeg https://ffmpeg.org/
 RUN  \
@@ -525,7 +521,6 @@ RUN  \
     ./configure \
     --disable-debug \
     --disable-doc \
-    --disable-ffplay \
     --enable-fontconfig \
     --enable-gpl \
     --enable-libaom \
