@@ -54,7 +54,9 @@ RUN apt update \
     libraw1394-dev \
     librtmp-dev \
     libsdl2-dev \
+    libsoup2.4-dev \
     libsrt-openssl-dev \
+    libsrtp2-dev \
     libssl-dev \
     libswscale-dev \
     libtheora-dev \
@@ -62,7 +64,7 @@ RUN apt update \
     libvpx-dev \
     libwebp-dev \
     libx264-dev \
-    libx265-dev \
+    libx265-dev \ 
     libxcb-shape0-dev \
     libxcb-shm0-dev \
     libxcb-xfixes0-dev \
@@ -76,7 +78,6 @@ RUN apt update \
     x11proto-video-dev \
     yasm \
     zlib1g-dev \
-    libsrtp2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ## Build ffmpeg https://ffmpeg.org/
